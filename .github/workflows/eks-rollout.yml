@@ -1,0 +1,36 @@
+name: Despliegue EKS - Estrategias de Rollout
+
+on:
+  workflow_dispatch:
+    inputs:
+      strategy:
+        description: "Estrategia a ejecutar"
+        required: true
+        default: "rolling-update"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Mostrar estrategia
+        run: echo "Estrategia seleccionada -> ${{ github.event.inputs.strategy }}"
+
+      - name: Rolling Update
+        if: ${{ github.event.inputs.strategy == 'rolling-update' }}
+        run: echo "Ejecutando Rolling Update"
+
+      - name: Recreate
+        if: ${{ github.event.inputs.strategy == 'recreate' }}
+        run: echo "Ejecutando Recreate"
+
+      - name: Blue Green
+        if: ${{ github.event.inputs.strategy == 'blue-green' }}
+        run: echo "Ejecutando Blue/Green"
+
+      - name: Canary
+        if: ${{ github.event.inputs.strategy == 'canary' }}
+        run: echo "Ejecutando Canary"

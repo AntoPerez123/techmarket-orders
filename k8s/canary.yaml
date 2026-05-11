@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: techmarket-canary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: techmarket
+      version: canary
+  template:
+    metadata:
+      labels:
+        app: techmarket
+        version: canary
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.25
+        ports:
+        - containerPort: 80

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: techmarket-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: techmarket
+  ports:
+    - port: 80
+      targetPort: 80
