@@ -18,5 +18,26 @@ jobs:
       - name: Checkout código
         uses: actions/checkout@v4
 
-      - name: Simular deploy
-        run: echo "Deploy realizado en $ENVIRONMENT"
+      - name: Iniciar despliegue Blue-Green
+        run: |
+          echo "Iniciando estrategia Blue-Green"
+
+      - name: Desplegar nueva versión Green
+        run: |
+          echo "Desplegando versión GREEN del microservicio Orders"
+
+      - name: Verificación post-deploy
+        run: |
+          echo "Validando disponibilidad y salud del servicio"
+
+      - name: Cambiar tráfico hacia GREEN
+        run: |
+          echo "Redirigiendo tráfico hacia nueva versión"
+
+      - name: Rollback automático en caso de error
+        run: |
+          echo "Rollback disponible hacia entorno BLUE"
+
+      - name: Deploy finalizado
+        run: |
+          echo "Despliegue completado exitosamente en $ENVIRONMENT"

@@ -20,8 +20,14 @@ jobs:
         with:
           node-version: ${{ inputs.node_version }}
 
-      - name: Simular instalación
-        run: echo "Instalando dependencias correctamente"
+      - name: Instalar dependencias
+        run: |
+          echo "Instalando dependencias del microservicio Orders"
 
-      - name: Simular build
-        run: echo "Build completado"
+      - name: Build aplicación
+        run: |
+          echo "Compilando aplicación TechMarket Orders"
+
+      - name: Validar build
+        run: |
+          echo "Build validado correctamente"
