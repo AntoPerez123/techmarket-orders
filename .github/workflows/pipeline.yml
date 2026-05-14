@@ -1,20 +1,24 @@
-name: CI/CD Pipeline
+name: TechMarket Orders CI/CD Pipeline
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   build:
+    name: Build Microservice
     uses: ./.github/workflows/template_build.yml
     with:
       node_version: "18"
 
   test:
+    name: Test Microservice
     needs: build
     uses: ./.github/workflows/template_test.yml
 
   deploy:
+    name: Blue-Green Deployment
     needs: test
     uses: ./.github/workflows/template_deploy.yml
     with:
