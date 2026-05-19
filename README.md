@@ -1,137 +1,47 @@
 # TechMarket Orders - CI/CD Blue-Green Deployment
 
-## Descripción del Proyecto
+## Descripción del proyecto
 
 Este proyecto implementa una estrategia de despliegue continuo para el microservicio **TechMarket Orders**, encargado del procesamiento de pedidos en línea.
 
-La solución fue diseñada considerando principios DevOps y metodologías ágiles, utilizando pipelines CI/CD automatizados con GitHub Actions y estrategias modernas de despliegue orientadas a minimizar downtime y mejorar la continuidad operativa.
+La solución fue diseñada utilizando **GitHub Actions**, **Kubernetes** y **AWS EKS** para demostrar un flujo CI/CD orientado a reducir downtime, facilitar rollback y mejorar la continuidad operativa del negocio.
 
----
+## Objetivo
 
-# Objetivos
+Implementar y demostrar una estrategia de despliegue **Blue-Green Deployment** para el microservicio TechMarket Orders, asegurando alta disponibilidad, bajo riesgo en producción y capacidad de rollback rápido.
 
-- Implementar un pipeline CI/CD automatizado.
-- Aplicar una estrategia Blue-Green Deployment.
-- Reducir el riesgo de fallos en producción.
-- Garantizar alta disponibilidad del servicio.
-- Facilitar rollback rápido ante incidentes.
-- Mejorar la continuidad operativa y la agilidad del negocio.
+## Estrategias analizadas
 
----
+Durante el análisis se compararon cuatro estrategias de despliegue:
 
-# Estrategias de Despliegue Analizadas
+- **All-in-one:** despliega toda la nueva versión de una sola vez. Es rápida, pero tiene alto riesgo de downtime.
+- **Rolling Update:** actualiza los pods gradualmente. Reduce interrupciones, pero pueden convivir versiones distintas durante el despliegue.
+- **Canary:** libera la nueva versión a una parte reducida de usuarios. Reduce riesgo, pero requiere mayor monitoreo.
+- **Blue-Green:** mantiene dos versiones paralelas, una estable y una nueva. Permite validar antes de redirigir tráfico y facilita rollback rápido.
 
-## 1. All-In-Once
+## Estrategia seleccionada
 
-Despliega toda la nueva versión simultáneamente reemplazando la versión anterior.
+La estrategia seleccionada para **TechMarket Orders** fue **Blue-Green Deployment**.
 
-### Ventajas
-- Implementación rápida.
-- Bajo costo operativo.
+Se eligió esta estrategia porque el microservicio Orders es crítico para el procesamiento de pedidos en línea. Si este servicio falla, puede afectar ventas y experiencia del cliente.
 
-### Desventajas
-- Alto riesgo de downtime.
-- Rollback complejo.
-- Riesgo elevado en sistemas críticos.
+Blue-Green permite mantener una versión estable activa mientras se despliega y valida una nueva versión en paralelo. Si la nueva versión presenta problemas, el rollback puede realizarse rápidamente redirigiendo el tráfico nuevamente hacia la versión estable.
 
----
-
-## 2. Rolling Update
-
-Actualiza gradualmente las instancias o pods del sistema.
-
-### Ventajas
-- Menor downtime.
-- Actualización progresiva.
-
-### Desventajas
-- Posibles inconsistencias entre versiones.
-- Rollback más lento.
-
----
-
-## 3. Canary Deployment
-
-Despliega la nueva versión solo para un pequeño porcentaje de usuarios.
-
-### Ventajas
-- Reducción de riesgo.
-- Permite validación gradual.
-
-### Desventajas
-- Mayor complejidad operativa.
-- Requiere monitoreo avanzado.
-
----
-
-## 4. Blue-Green Deployment
-
-Mantiene dos entornos idénticos: Blue (activo) y Green (nuevo).
-
-### Ventajas
-- Cero downtime.
-- Rollback inmediato.
-- Alta disponibilidad.
-
-### Desventajas
-- Mayor consumo de infraestructura.
-- Mayor costo operativo.
-
----
-
-# Estrategia Seleccionada
-
-## Blue-Green Deployment
-
-La estrategia seleccionada para el microservicio "Orders" fue Blue-Green Deployment debido a que el servicio requiere:
-
-- Alta disponibilidad.
-- Continuidad operativa.
-- Rollback rápido.
-- Baja interrupción para usuarios.
-- Protección del SLA.
-- Menor riesgo en despliegues críticos.
-
-Esta estrategia permite mantener un entorno estable en producción mientras se despliega y valida una nueva versión en un entorno paralelo.
-
----
-
-# Arquitectura Utilizada
+## Tecnologías utilizadas
 
 - GitHub Actions
-- Docker
-- Kubernetes (EKS)
-- AWS
-- YAML Deployments
-- CI/CD Pipeline
+- AWS EKS
+- Kubernetes
+- AWS CloudShell
+- kubectl
+- YAML manifests
+- GitHub Secrets
 
----
+## Estructura del repositorio
 
-# Pipeline CI/CD
-
-El pipeline automatizado incluye las siguientes etapas:
-
-## Build
-Compilación y preparación del microservicio Orders.
-
-## Test
-Validación y pruebas del servicio antes del despliegue.
-
-## Deploy
-Despliegue automatizado mediante estrategia Blue-Green.
-
-## Post-Deploy Validation
-Verificación de disponibilidad y estabilidad del servicio.
-
-## Rollback
-Capacidad de volver inmediatamente a la versión anterior ante incidentes.
-
----
-
-# Estructura del Proyecto
-
-```txt
+```text
 .github/workflows/
+├── eks-rollout.yml
 ├── pipeline.yml
 ├── template_build.yml
 ├── template_test.yml
@@ -141,47 +51,10 @@ k8s/
 ├── blue-green.yaml
 ├── canary.yaml
 ├── recreate.yaml
-└── rolling-update.yaml
-```
+├── rolling-update.yaml
+└── service.yaml
 
-# Continuidad Operativa
 
-La estrategia Blue-Green contribuye a la continuidad operativa al mantener dos entornos disponibles simultáneamente. Esto permite realizar despliegues sin interrumpir el servicio y ejecutar rollback inmediato en caso de falla.
-
----
-
-# Agilidad del Negocio
-
-La automatización CI/CD permite:
-
-- Entregas más rápidas.
-- Menor intervención manual.
-- Reducción de errores humanos.
-- Integración continua.
-- Mayor velocidad de respuesta ante cambios.
-
----
-
-# Evidencias
-
-## Pipeline GitHub Actions
-Capturas del pipeline ejecutándose correctamente.
-
-## Deploy Blue-Green
-Capturas de despliegue y cambio de tráfico.
-
-## Logs
-Validación de build, test y deploy.
-
----
-
-# Autor
-
-Antonia Pérez  
+Antonia Pérez
 AUY1104 - Ciclo de Vida del Software II
-
----
-
-# Declaración Uso IA
-
-Se utilizó inteligencia artificial como apoyo para explicación conceptual.
+Evaluación Parcial N°2
