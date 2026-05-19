@@ -64,7 +64,7 @@ jobs:
           echo "Ejecutando estrategia Blue/Green"
           kubectl apply -f k8s/blue-green.yaml
           kubectl apply -f k8s/service.yaml
-          kubectl rollout status deployment/techmarket-blue
+          kubectl rollout status deployment/orders-blue
           kubectl get pods
           kubectl get svc
 
