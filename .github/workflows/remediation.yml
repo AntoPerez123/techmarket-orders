@@ -1,0 +1,65 @@
+name: Remediacion TechMarket Orders
+
+on:
+  workflow_dispatch:
+    inputs:
+      failure_type:
+        description: "Tipo de falla a simular"
+        required: true
+        default: "latency"
+        type: choice
+        options:
+          - build-error
+          - config-error
+          - latency
+          - healthcheck-error
+
+jobs:
+  remediation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Inicio del proceso de remediacion
+        run: |
+          echo "Iniciando estrategia de remediacion para TechMarket Orders"
+          echo "Falla simulada seleccionada: ${{ github.event.inputs.failure_type }}"
+
+      - name: Deteccion de falla
+        run: |
+          echo "Ejecutando deteccion de falla..."
+          echo "Health check simulado sobre version Green"
+          echo "Resultado: FALLA DETECTADA"
+          echo "Tipo de falla: ${{ github.event.inputs.failure_type }}"
+
+      - name: Notificacion del incidente
+        run: |
+          echo "Notificando incidente al equipo DevOps"
+          echo "Servicio afectado: TechMarket Orders"
+          echo "Version afectada: Green"
+          echo "Accion requerida: rollback hacia Blue"
+
+      - name: Accion correctiva - Rollback a Blue
+        run: |
+          echo "Ejecutando rollback automatico hacia la version Blue"
+          echo "kubectl apply -f k8s/blue-green.yaml"
+          echo "kubectl apply -f k8s/service.yaml"
+          echo "Redirigiendo trafico hacia la version estable Blue"
+          echo "Rollback completado correctamente"
+
+      - name: Validacion post-remediacion
+        run: |
+          echo "Validando estado del servicio despues de la remediacion"
+          echo "kubectl get pods"
+          echo "kubectl get svc"
+          echo "Health check post-remediacion: OK"
+          echo "Servicio TechMarket Orders estable"
+
+      - name: Resultado final
+        run: |
+          echo "Remediacion completada exitosamente"
+          echo "MTTR estimado: bajo"
+          echo "Disponibilidad del servicio: mantenida"
+          echo "Impacto en usuarios: reducido"
