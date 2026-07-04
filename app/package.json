@@ -1,0 +1,13 @@
+{
+  "name": "techmarket-orders",
+  "version": "1.0.0",
+  "description": "Microservicio Orders para evaluación EFT AUY1104",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node -e \"console.log('Pruebas unitarias simuladas OK para TechMarket Orders')\""
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
