@@ -1,16 +1,42 @@
 apiVersion: v1
 kind: Service
-
 metadata:
-  name: orders-service
-
+  name: orders-blue
+  namespace: techmarket
 spec:
-  type: LoadBalancer
-
   selector:
     app: techmarket-orders
     version: blue
-
   ports:
-    - port: 80
-      targetPort: 80
+    - name: http
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders-green
+  namespace: techmarket
+spec:
+  selector:
+    app: techmarket-orders
+    version: green
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders-active
+  namespace: techmarket
+spec:
+  type: LoadBalancer
+  selector:
+    app: techmarket-orders
+    version: blue
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
