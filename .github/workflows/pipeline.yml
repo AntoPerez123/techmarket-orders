@@ -1,27 +1,24 @@
-name: TechMarket Orders CI/CD Pipeline
+name: Pipeline CI TechMarket Orders
 
 on:
   push:
     branches:
       - main
-
+      - feature/**
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build Microservice
-    uses: ./.github/workflows/template_build.yml
-    with:
-      node_version: "18"
-
   test:
-    name: Test Microservice
-    needs: build
+    name: Ejecutar pruebas reutilizables
     uses: ./.github/workflows/template_test.yml
 
-  deploy:
-    name: Blue-Green Deployment
+  build:
+    name: Construir imagen Docker reutilizable
     needs: test
-    uses: ./.github/workflows/template_deploy.yml
+    uses: ./.github/workflows/template_build.yml
     with:
-      environment: "production"
+      image_name: techmarket-orders
+      image_tag: ${{ github.sha }}

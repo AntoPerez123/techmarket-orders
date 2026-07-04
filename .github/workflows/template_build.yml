@@ -1,33 +1,36 @@
-name: Build Template v1.0.0
+name: Template Build Docker
 
 on:
   workflow_call:
     inputs:
-      node_version:
+      image_name:
+        required: true
+        type: string
+      image_tag:
         required: true
         type: string
 
 jobs:
   build:
+    name: Build imagen Docker
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout código
+      - name: Checkout repositorio
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ inputs.node_version }}
-
-      - name: Instalar dependencias
+      - name: Verificar archivos de la aplicación
         run: |
-          echo "Instalando dependencias del microservicio Orders"
+          ls -la
+          ls -la app
+          test -f app/Dockerfile
+          test -f app/package.json
+          test -f app/src/server.js
 
-      - name: Build aplicación
+      - name: Construir imagen Docker
         run: |
-          echo "Compilando aplicación TechMarket Orders"
+          docker build -t ${{ inputs.image_name }}:${{ inputs.image_tag }} ./app
 
-      - name: Validar build
+      - name: Verificar imagen construida
         run: |
-          echo "Build validado correctamente"
+          docker images | grep ${{ inputs.image_name }}

@@ -1,24 +1,26 @@
-name: Test Template v1.0.0
+name: Template Test
 
 on:
   workflow_call:
 
 jobs:
   test:
+    name: Test microservicio Orders
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout código
+      - name: Checkout repositorio
         uses: actions/checkout@v4
 
-      - name: Ejecutar pruebas unitarias
-        run: |
-          echo "Ejecutando pruebas del microservicio Orders"
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-      - name: Validar API
-        run: |
-          echo "Validando endpoints críticos"
+      - name: Instalar dependencias
+        working-directory: app
+        run: npm install
 
-      - name: Verificar estabilidad
-        run: |
-          echo "Pruebas completadas correctamente"
+      - name: Ejecutar pruebas
+        working-directory: app
+        run: npm test
