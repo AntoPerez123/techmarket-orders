@@ -1,56 +1,91 @@
 apiVersion: apps/v1
 kind: Deployment
-
 metadata:
   name: orders-blue
-
+  namespace: techmarket
+  labels:
+    app: techmarket-orders
+    version: blue
 spec:
   replicas: 2
-
   selector:
     matchLabels:
       app: techmarket-orders
       version: blue
-
   template:
     metadata:
       labels:
         app: techmarket-orders
         version: blue
-
     spec:
       containers:
-      - name: orders-container
-        image: nginx:1.25
-
-        ports:
-        - containerPort: 80
-
+        - name: orders
+          image: IMAGE_PLACEHOLDER
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: APP_VERSION
+              value: "blue"
+            - name: FORCE_ERROR
+              value: "false"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
 ---
 apiVersion: apps/v1
 kind: Deployment
-
 metadata:
   name: orders-green
-
+  namespace: techmarket
+  labels:
+    app: techmarket-orders
+    version: green
 spec:
   replicas: 2
-
   selector:
     matchLabels:
       app: techmarket-orders
       version: green
-
   template:
     metadata:
       labels:
         app: techmarket-orders
         version: green
-
     spec:
       containers:
-      - name: orders-container
-        image: nginx:1.25
-
-        ports:
-        - containerPort: 80
+        - name: orders
+          image: IMAGE_PLACEHOLDER
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: APP_VERSION
+              value: "green"
+            - name: FORCE_ERROR
+              value: "FORCE_ERROR_PLACEHOLDER"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
