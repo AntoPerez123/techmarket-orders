@@ -1,0 +1,89 @@
+name: Deploy Blue-Green EKS con Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Tag de imagen a desplegar"
+        required: true
+        default: "latest"
+      force_error:
+        description: "Simular error en versión green"
+        required: true
+        default: "false"
+
+jobs:
+  deploy:
+    name: Deploy Blue-Green con rollback automático
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: us-east-1
+      ECR_REPOSITORY: techmarket-orders
+      CLUSTER_NAME: techmarket-orders-eks
+      NAMESPACE: techmarket
+
+    steps:
+      - name: Checkout repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar credenciales AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login a Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Definir imagen a desplegar
+        run: |
+          echo "IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.event.inputs.image_tag }}" >> $GITHUB_ENV
+
+      - name: Configurar acceso a EKS
+        run: |
+          aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
+
+      - name: Aplicar namespace
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+
+      - name: Preparar manifiestos Blue-Green
+        run: |
+          sed -i "s|IMAGE_PLACEHOLDER|$IMAGE_URI|g" k8s/blue-green.yaml
+          sed -i "s|FORCE_ERROR_PLACEHOLDER|${{ github.event.inputs.force_error }}|g" k8s/blue-green.yaml
+
+      - name: Desplegar Blue y Green
+        run: |
+          kubectl apply -f k8s/blue-green.yaml
+          kubectl apply -f k8s/service.yaml
+
+      - name: Esperar rollout Green
+        run: |
+          kubectl rollout status deployment/orders-green -n $NAMESPACE --timeout=120s
+
+      - name: Validación de salud Green
+        run: |
+          kubectl run healthcheck-green \
+            --rm -i \
+            --restart=Never \
+            --namespace=$NAMESPACE \
+            --image=curlimages/curl \
+            -- curl -f http://orders-green:3000/health
+
+      - name: Cambiar tráfico a Green
+        run: |
+          kubectl patch service orders-active -n $NAMESPACE -p '{"spec":{"selector":{"app":"techmarket-orders","version":"green"}}}'
+          kubectl describe service orders-active -n $NAMESPACE
+
+      - name: Rollback automático a Blue
+        if: failure()
+        run: |
+          echo "Fallo detectado. Ejecutando rollback automático hacia Blue..."
+          kubectl patch service orders-active -n $NAMESPACE -p '{"spec":{"selector":{"app":"techmarket-orders","version":"blue"}}}'
+          kubectl rollout undo deployment/orders-green -n $NAMESPACE || true
+          kubectl describe service orders-active -n $NAMESPACE
+          echo "Rollback completado."
